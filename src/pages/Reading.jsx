@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EnToggle, SectionHead, SideCard, useLang, addXP } from "../components/chrome";
+import { EnToggle, SectionHead, SideCard, Steps, useLang, addXP } from "../components/chrome";
 import { readingItems, readingSections } from "../data";
 
 export default function ReadingPage({ state, setState }) {
@@ -71,6 +71,7 @@ export default function ReadingPage({ state, setState }) {
     <div>
       <SectionHead title={`${t.reading} — 40 Q / 60 min (Q1–40 in order)`} sub={`${t.readNote} • ${correct}/${keys.length} correct`}
         right={<EnToggle showEn={showEn} setShowEn={setShowEn} />} />
+      <Steps steps={[["1", "Read the question first"], ["2", "Find it in the text — don't overthink"], ["3", "Q18–40 get longer and harder"]]} />
       <div className="grid lg:grid-cols-[280px_1fr_260px] gap-3">
         <SideCard title={`${t.queTypes} • Reading`}>
           <div className="space-y-2 max-h-[600px] overflow-auto">

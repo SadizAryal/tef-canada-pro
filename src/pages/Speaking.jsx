@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Mic } from "lucide-react";
-import { addXP, EnToggle, SectionHead, SideCard, useLang, useTimer } from "../components/chrome";
+import { addXP, EnToggle, SectionHead, SideCard, Steps, useLang, useTimer } from "../components/chrome";
 import { speakingPromptsA, speakingPromptsB } from "../data";
 import { rubricToScaled, speakFrench } from "../utils";
 
@@ -34,6 +34,7 @@ export default function SpeakingPage({ state, setState }) {
     <div>
       <SectionHead title={`${t.speaking} — 15 min: A ask-for-info (5 min) + B convince (10 min)`} sub={t.speakFr}
         right={<EnToggle showEn={showEn} setShowEn={setShowEn} />} />
+      <Steps steps={[["1", "Read the ad / flyer"], ["2", "Record yourself speaking French"], ["3", "Play back, self-score, save"]]} />
       <div className="grid lg:grid-cols-[300px_1fr_260px] gap-3">
         <SideCard title={`${t.queTypes} • Speaking`}>
           <div className="flex gap-2 mb-2">

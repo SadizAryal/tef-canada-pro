@@ -3,6 +3,7 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import { LangCtx, Navbar, usePersistentState } from "./components/chrome";
 import { STR } from "./i18n";
 import HomePage from "./pages/Home";
+import LearnPage from "./pages/Learn";
 import ListeningPage from "./pages/Listening";
 import ReadingPage from "./pages/Reading";
 import WritingPage from "./pages/Writing";
@@ -23,6 +24,7 @@ export default function App() {
           <main className="max-w-7xl mx-auto px-4 py-4">
             <Routes>
               <Route path="/" element={<HomePage state={state} />} />
+              <Route path="/learn" element={<LearnPage />} />
               <Route path="/listening" element={<ListeningPage state={state} setState={setState} />} />
               <Route path="/reading" element={<ReadingPage state={state} setState={setState} />} />
               <Route path="/writing" element={<WritingPage state={state} setState={setState} />} />

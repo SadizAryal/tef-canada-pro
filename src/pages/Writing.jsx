@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Volume2 } from "lucide-react";
-import { addXP, EnToggle, SectionHead, SideCard, useLang, useTimer } from "../components/chrome";
+import { addXP, EnToggle, SectionHead, SideCard, Steps, useLang, useTimer } from "../components/chrome";
 import { sampleWritingA, sampleWritingB, writingPromptsA, writingPromptsB } from "../data";
 import { countWords, rubricToScaled, speakFrench } from "../utils";
 
@@ -39,6 +39,7 @@ export default function WritingPage({ state, setState }) {
     <div>
       <SectionHead title={`${t.writing} — 60 min: A 80+ words (25 min) + B 200+ words (35 min)`} sub={t.writeFrNote}
         right={<EnToggle showEn={showEn} setShowEn={setShowEn} />} />
+      <Steps steps={[["1", "Start the timer — real limits"], ["2", "Write in French, use the accent keys"], ["3", "Tick the checklist, save at 310+"]]} />
       <div className="grid lg:grid-cols-[300px_1fr_260px] gap-3">
         <SideCard title={`${t.queTypes} • Writing`}>
           <div className="flex gap-2 mb-2">

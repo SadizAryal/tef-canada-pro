@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Play, Square, Volume2 } from "lucide-react";
-import { addXP, EnToggle, SectionHead, SideCard, useLang } from "../components/chrome";
+import { addXP, EnToggle, SectionHead, SideCard, Steps, useLang, VoiceBar } from "../components/chrome";
 import { listeningItems, listeningSections } from "../data";
 import { pctToBand, speakFrench, stopSpeak } from "../utils";
 
@@ -30,9 +30,14 @@ export default function ListeningPage({ state, setState }) {
   const used = plays[group.key] || 0;
   const left = maxPlays - used;
 
-  const play = (rate = 1) => {
+  const play = () => {
     if (left <= 0) return;
-    speakFrench(group.items[0].audio, rate * 0.95);
+    speakFrench(group.items[0].audio);
+    setPlays((p) => ({ ...p, [group.key]: (p[group.key] || 0) + 1 }));
+  };
+  const playSlow = () => {
+    if (left <= 0) return;
+    speakFrench(group.items[0].audio, { rate: 0.65 });
     setPlays((p) => ({ ...p, [group.key]: (p[group.key] || 0) + 1 }));
   };
   const check = (item, i) => {
@@ -54,6 +59,9 @@ export default function ListeningPage({ state, setState }) {
       <SectionHead title={`${t.listening} — 40 Q / 40 min (Q1–40 in order)`} sub={`${t.listenNote} • ${correct}/${keys.length} correct`}
         right={<><EnToggle showEn={showEn} setShowEn={setShowEn} />
           <label className="text-xs flex items-center gap-1 font-bold text-slate-600 bg-white border border-slate-300 rounded-lg px-2.5 py-1"><input type="checkbox" checked={examMode} onChange={(e) => setExamMode(e.target.checked)} /> {examMode ? t.examMode : t.practiceMode}</label></>} />
+      <Steps steps={[["1", "Press Play once and listen (exam rule)"], ["2", "Pick your answer — no going back"], ["3", "Then check the translation below"]]} />
+      <div className="mb-3"><VoiceBar /></div>
+      <div className="mb-3 text-xs text-slate-500">Robot voice not clear enough? Real human audio lessons are on the <b>Learn</b> page.</div>
       <div className="grid lg:grid-cols-[280px_1fr_260px] gap-3">
         <SideCard title={`${t.queTypes} • Listening`}>
           <div className="space-y-2 max-h-[600px] overflow-auto">
@@ -65,7 +73,7 @@ export default function ListeningPage({ state, setState }) {
                     <button key={l.n} onClick={() => pick(l.n)}
                       className={`w-full text-left px-2.5 py-1.5 rounded-lg text-[13px] border ${sel === l.n ? "bg-blue-700 text-white border-blue-700" : "bg-slate-50 border-slate-200 hover:border-blue-400"}`}>
                       <span className="font-bold">Q{l.n}</span> <span className="opacity-80">{l.topic}</span>
-                      {l.choices.length === 3 && <span className="ml-1 text-[10px] font-bold bg-amber-100 text-amber-800 px-1 rounded">3 ch.</span>}
+                      {l.choices.length === 3 && <span className="ml-1 text-[10px] font-bold">• 3 choices</span>}
                       {done["q" + l.n] && <span className="ml-1 text-[11px] font-bold text-green-600">✓</span>}
                     </button>
                   ))}
@@ -81,8 +89,8 @@ export default function ListeningPage({ state, setState }) {
             {group.items.length > 1 && <span className="ml-2 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">1 audio → {group.items.length} questions (exam rule)</span>}
           </div>
           <div className="flex flex-wrap gap-2 mt-3">
-            <button disabled={left <= 0} onClick={() => play(1)} className="inline-flex items-center gap-1.5 bg-slate-900 text-white font-bold px-4 py-2 rounded-lg text-sm disabled:opacity-40"><Play size={15} /> {t.play} ({left} left)</button>
-            {!examMode && <button disabled={left <= 0} onClick={() => play(0.7)} className="inline-flex items-center gap-1.5 bg-white border border-slate-300 font-bold px-4 py-2 rounded-lg text-sm disabled:opacity-40"><Volume2 size={15} /> {t.slow}</button>}
+            <button disabled={left <= 0} onClick={play} className="inline-flex items-center gap-1.5 bg-slate-900 text-white font-bold px-5 py-2.5 rounded-lg text-[15px] disabled:opacity-40"><Play size={16} /> {t.play} ({left} left)</button>
+            {!examMode && <button disabled={left <= 0} onClick={playSlow} className="inline-flex items-center gap-1.5 bg-white border border-slate-300 font-bold px-4 py-2 rounded-lg text-sm disabled:opacity-40"><Volume2 size={15} /> {t.slow}</button>}
             <button onClick={stopSpeak} className="inline-flex items-center gap-1.5 bg-white border border-slate-300 px-3 py-2 rounded-lg text-sm"><Square size={14} /> {t.stop}</button>
           </div>
           {group.items.map((item) => (

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { BookOpen, Ear, Eye, FileText, Flame, Home, Mic, PenLine, Star, Timer, Volume2 } from "lucide-react";
+import { BookOpen, Ear, Eye, FileText, Flame, GraduationCap, Home, Mic, PenLine, Star, Timer, Volume2 } from "lucide-react";
+import { listFrenchVoices } from "../utils";
 import { loadState, saveState, speakFrench, stopSpeak, touchStreak } from "../utils";
 import { STR } from "../i18n";
 
@@ -30,9 +31,10 @@ export function useTimer() {
 export function Navbar({ state }) {
   const { lang, setLang, t } = useLang();
   const links = [
-    ["/", t.home, Home], ["/listening", t.listening, Ear], ["/reading", t.reading, Eye],
+    ["/", t.home, Home], ["/learn", lang === "fr" ? "Apprendre" : "Learn", GraduationCap],
+    ["/listening", t.listening, Ear], ["/reading", t.reading, Eye],
     ["/writing", t.writing, PenLine], ["/speaking", t.speaking, Mic],
-    ["/mock", t.mock, Timer], ["/study", t.study, BookOpen], ["/guide", lang === "fr" ? "Guide" : "Guide", FileText],
+    ["/mock", t.mock, Timer], ["/study", t.study, BookOpen], ["/guide", "Guide", FileText],
   ];
   return (
     <div className="sticky top-0 z-30 bg-white border-b border-slate-200">
@@ -96,5 +98,58 @@ export function SpeakBtn({ text, label }) {
     <button onClick={() => speakFrench(text)} className="inline-flex items-center gap-1 text-xs font-bold border border-slate-300 rounded-lg px-2 py-1 bg-white hover:border-blue-500">
       <Volume2 size={12} /> {label || "Play"}
     </button>
+  );
+}
+
+// Plain 3-step strip so every page is obvious at a glance.
+export function Steps({ steps }) {
+  return (
+    <div className="grid sm:grid-cols-3 gap-2 mb-3">
+      {steps.map(([n, txt], i) => (
+        <div key={i} className="pro-card px-3 py-2 flex items-center gap-2">
+          <span className="w-6 h-6 shrink-0 rounded-full bg-slate-900 text-white text-xs font-black flex items-center justify-center">{n}</span>
+          <span className="text-[13px] text-slate-700">{txt}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Voice picker: fixes the "weird robot" problem by letting you choose
+// the most human French voice on your device + speed.
+export function VoiceBar() {
+  const [voices, setVoices] = useState([]);
+  const [prefs, setPrefs] = useState(() => {
+    try {
+      return { voiceURI: localStorage.getItem("tef-voice") || "auto", rate: localStorage.getItem("tef-rate") || "0.92" };
+    } catch { return { voiceURI: "auto", rate: "0.92" }; }
+  });
+  useEffect(() => {
+    const load = () => setVoices(listFrenchVoices());
+    load();
+    try { window.speechSynthesis?.addEventListener("voiceschanged", load); } catch {}
+    return () => { try { window.speechSynthesis?.removeEventListener("voiceschanged", load); } catch {} };
+  }, []);
+  const set = (patch) => {
+    const next = { ...prefs, ...patch };
+    setPrefs(next);
+    try {
+      localStorage.setItem("tef-voice", next.voiceURI === "auto" ? "" : next.voiceURI);
+      localStorage.setItem("tef-rate", next.rate);
+    } catch {}
+  };
+  return (
+    <div className="flex flex-wrap items-center gap-2 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5">
+      <span className="text-xs font-bold text-slate-500">Voice / Voix :</span>
+      <select value={prefs.voiceURI} onChange={(e) => set({ voiceURI: e.target.value })} className="text-xs border border-slate-300 rounded-lg px-2 py-1 max-w-[190px] bg-white">
+        <option value="auto">Auto (best available)</option>
+        {voices.map((v) => <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}
+      </select>
+      <span className="text-xs font-bold text-slate-500">Speed :</span>
+      {[["0.75", "Slow"], ["0.92", "Normal"], ["1.05", "Fast"]].map(([r, l]) => (
+        <button key={r} onClick={() => set({ rate: r })} className={`text-xs font-bold px-2 py-1 rounded-lg border ${prefs.rate === r ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-300"}`}>{l}</button>
+      ))}
+      <button onClick={() => speakFrench("Bonjour, ceci est ma voix française. À mon avis, vous allez réussir.", { rate: parseFloat(prefs.rate), voiceURI: prefs.voiceURI === "auto" ? "" : prefs.voiceURI })} className="text-xs font-bold text-blue-700 underline">Test my voice</button>
+    </div>
   );
 }

@@ -1,17 +1,56 @@
 // Shared helpers: TTS, storage, CLB mapping
 
-export function speakFrench(text, rate = 0.95) {
+export function listFrenchVoices() {
+  try {
+    const synth = window.speechSynthesis;
+    if (!synth) return [];
+    return synth.getVoices().filter((v) => v.lang?.toLowerCase().startsWith("fr"));
+  } catch { return []; }
+}
+
+// Prefer the most human-sounding French voice on this device:
+// Google français > Microsoft natural (Denise/Henri) > any other FR voice.
+export function pickBestFrenchVoice() {
+  const voices = listFrenchVoices();
+  if (!voices.length) return null;
+  const byName = (re) => voices.find((v) => re.test(v.name));
+  return (
+    byName(/google.*français/i) ||
+    byName(/denise/i) || byName(/henri/i) ||
+    byName(/natural/i) ||
+    byName(/canada/i) ||
+    voices.find((v) => v.localService === false) ||
+    voices[0]
+  );
+}
+
+export function getVoicePrefs() {
+  try {
+    return {
+      voiceURI: localStorage.getItem("tef-voice") || "",
+      rate: parseFloat(localStorage.getItem("tef-rate") || "0.92"),
+    };
+  } catch { return { voiceURI: "", rate: 0.92 }; }
+}
+
+export function speakFrench(text, rateOrOpts = 0.92) {
   try {
     const synth = window.speechSynthesis;
     if (!synth) return;
     synth.cancel();
+    const opts = typeof rateOrOpts === "object" ? rateOrOpts : { rate: rateOrOpts };
+    const prefs = getVoicePrefs();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "fr-FR";
-    u.rate = rate;
-    // pick French voice if available
+    u.rate = opts.rate ?? prefs.rate ?? 0.92;
+    u.pitch = opts.pitch ?? 1;
     const voices = synth.getVoices();
-    const fr = voices.find((v) => v.lang?.toLowerCase().startsWith("fr"));
-    if (fr) u.voice = fr;
+    const saved = voices.find((v) => v.voiceURI === (opts.voiceURI || prefs.voiceURI));
+    if (saved) u.voice = saved;
+    else {
+      const best = pickBestFrenchVoice();
+      if (best) u.voice = best;
+    }
     synth.speak(u);
   } catch {}
 }
