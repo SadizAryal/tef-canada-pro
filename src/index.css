@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* Creamy aesthetic: remap cool blues/slates to warm caramel + cream */
+@theme {
+  --color-blue-50: #fdf6ea;
+  --color-blue-100: #f9e9d0;
+  --color-blue-200: #f2d5a8;
+  --color-blue-500: #c2703d;
+  --color-blue-600: #a85a28;
+  --color-blue-700: #8a4a20;
+  --color-blue-800: #6f3a18;
+  --color-slate-50: #faf6ee;
+  --color-slate-100: #f3ecdc;
+  --color-slate-200: #e7dbc2;
+  --color-slate-300: #d8c8a8;
+  --color-slate-400: #b3a182;
+  --color-slate-500: #97836a;
+  --color-slate-600: #75624e;
+  --color-slate-700: #5c4c3c;
+  --color-slate-800: #4a3a2c;
+  --color-slate-900: #3a2b1e;
+}
+
+:root { color-scheme: light; }
+html, body, #root { min-height: 100%; }
+body {
+  font-family: "Inter", ui-sans-system, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f4edde;
+  color: #3a2b1e;
+}
+.pro-card {
+  background: #fffdf6;
+  border: 1px solid #e7dbc2;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(90, 64, 32, 0.07), 0 10px 28px -18px rgba(90, 64, 32, 0.35);
+}
